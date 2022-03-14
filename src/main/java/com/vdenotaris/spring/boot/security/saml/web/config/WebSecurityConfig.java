@@ -258,7 +258,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
 	@Qualifier("idp-shibboleth")
 	public ExtendedMetadataDelegate ssoShibbolethMetadataProvider()
 			throws MetadataProviderException {
-		String idpSSOCircleMetadataURL = "https://md.incommon.org/InCommon/InCommon-metadata.xml";
+		String idpSSOCircleMetadataURL = "https://md.itrust.illinois.edu/itrust-metadata/itrust-metadata.xml";
 		HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(
 				this.backgroundTaskTimer, httpClient(), idpSSOCircleMetadataURL);
 		httpMetadataProvider.setParserPool(parserPool());
