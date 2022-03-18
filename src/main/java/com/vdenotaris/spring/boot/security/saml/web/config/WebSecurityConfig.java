@@ -107,8 +107,14 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
 	private Timer backgroundTaskTimer;
 	private MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager;
 
-    @Value("${project.domain}")
-    private String domainName;
+    @Value("${saml.entityId}")
+    private String entityId;
+    @Value("${saml.discoveryURL}")
+    private String discoveryURL;
+    @Value("${saml.entityBaseUrl}")
+    private String entityBaseUrl;
+    @Value("${saml.metadataProvider}")
+    private String metadataProvider;
 
 	public void init() {
 		this.backgroundTaskTimer = new Timer(true);
@@ -243,6 +249,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
     @Bean
     public ExtendedMetadata extendedMetadata() {
 	    ExtendedMetadata extendedMetadata = new ExtendedMetadata();
+        extendedMetadata.setIdpDiscoveryURL(discoveryURL);
 	    extendedMetadata.setIdpDiscoveryEnabled(true);
 	    extendedMetadata.setSigningAlgorithm("http://www.w3.org/2001/04/xmldsig-more#rsa-sha256");
 	    extendedMetadata.setSignMetadata(true);
@@ -262,7 +269,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
 	@Qualifier("idp-shibboleth")
 	public ExtendedMetadataDelegate ssoShibbolethMetadataProvider()
 			throws MetadataProviderException {
-		String idpSSOCircleMetadataURL = "https://md.itrust.illinois.edu/itrust-metadata/itrust-metadata.xml";
+		String idpSSOCircleMetadataURL = metadataProvider;
 		HTTPMetadataProvider httpMetadataProvider = new HTTPMetadataProvider(
 				this.backgroundTaskTimer, httpClient(), idpSSOCircleMetadataURL);
 		httpMetadataProvider.setParserPool(parserPool());
@@ -270,6 +277,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
 				new ExtendedMetadataDelegate(httpMetadataProvider, extendedMetadata());
 		extendedMetadataDelegate.setMetadataTrustCheck(false);
 		extendedMetadataDelegate.setMetadataRequireSignature(false);
+
 		backgroundTaskTimer.purge();
 		return extendedMetadataDelegate;
 	}
@@ -289,9 +297,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
     @Bean
     public MetadataGenerator metadataGenerator() {
         MetadataGenerator metadataGenerator = new MetadataGenerator();
-        metadataGenerator.setEntityId("https://"+domainName+"/shibboleth");
+        metadataGenerator.setEntityBaseURL(entityBaseUrl);
+        metadataGenerator.setEntityId(entityId);
         metadataGenerator.setExtendedMetadata(extendedMetadata());
-        metadataGenerator.setIncludeDiscoveryExtension(false);
+        metadataGenerator.setIncludeDiscoveryExtension(true);
         metadataGenerator.setKeyManager(keyManager()); 
         return metadataGenerator;
     }
