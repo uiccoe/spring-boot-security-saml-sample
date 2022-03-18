@@ -503,7 +503,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
            		.antMatchers("/css/**").permitAll()
            		.antMatchers("/img/**").permitAll()
            		.antMatchers("/js/**").permitAll()
-           		.anyRequest().authenticated().and().formLogin();
+           		.anyRequest().authenticated();
         http
         		.logout()
         			.disable();	// The logout procedure is already handled by SAML filters.
