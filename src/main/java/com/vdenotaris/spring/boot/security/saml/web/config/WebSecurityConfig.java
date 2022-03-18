@@ -300,8 +300,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
         metadataGenerator.setEntityBaseURL(entityBaseUrl);
         metadataGenerator.setEntityId(entityId);
         metadataGenerator.setExtendedMetadata(extendedMetadata());
-        metadataGenerator.setIncludeDiscoveryExtension(true);
-        metadataGenerator.setKeyManager(keyManager()); 
+        metadataGenerator.setIncludeDiscoveryExtension(false);
+        metadataGenerator.setKeyManager(keyManager());
         return metadataGenerator;
     }
  
