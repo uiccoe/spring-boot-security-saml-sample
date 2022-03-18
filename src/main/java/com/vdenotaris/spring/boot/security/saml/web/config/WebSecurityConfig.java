@@ -211,11 +211,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
     public KeyManager keyManager() {
         DefaultResourceLoader loader = new DefaultResourceLoader();
         Resource storeFile = loader
-                .getResource("classpath:/saml/samlKeystore.jks");
-        String storePass = "nalle123";
+                .getResource("classpath:/saml/keystore.jks");
+        String storePass = "998163";
         Map<String, String> passwords = new HashMap<String, String>();
-        passwords.put("apollo", "nalle123");
-        String defaultKey = "apollo";
+        passwords.put("certificate", "998163");
+        String defaultKey = "certificate";
         return new JKSKeyManager(storeFile, storePass, passwords, defaultKey);
     }
     
