@@ -16,12 +16,7 @@
 
 package com.vdenotaris.spring.boot.security.saml.web.config;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Timer;
+import java.util.*;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.MultiThreadedHttpConnectionManager;
@@ -232,6 +227,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
     @Bean
     public WebSSOProfileOptions defaultWebSSOProfileOptions() {
         WebSSOProfileOptions webSSOProfileOptions = new WebSSOProfileOptions();
+        Set<String> allowedIdps = new HashSet<>();
+        allowedIdps.add("https://shibboleth.uic.edu/shibboleth");
+        webSSOProfileOptions.setAllowedIDPs(allowedIdps);
+        webSSOProfileOptions.setAssertionConsumerIndex(5);
         webSSOProfileOptions.setIncludeScoping(false);
         return webSSOProfileOptions;
     }
@@ -298,6 +297,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
     public MetadataGenerator metadataGenerator() {
         MetadataGenerator metadataGenerator = new MetadataGenerator();
         metadataGenerator.setEntityBaseURL(entityBaseUrl);
+        metadataGenerator.setAssertionConsumerIndex(5);
         metadataGenerator.setEntityId(entityId);
         metadataGenerator.setExtendedMetadata(extendedMetadata());
         metadataGenerator.setIncludeDiscoveryExtension(false);
