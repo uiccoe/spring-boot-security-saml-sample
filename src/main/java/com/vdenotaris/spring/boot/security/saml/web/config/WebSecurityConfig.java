@@ -498,11 +498,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
         http        
             .authorizeRequests()
            		.antMatchers("/").permitAll()
+                .antMatchers("/Shibboleth.sso/**").permitAll()
            		.antMatchers("/saml/**").permitAll()
            		.antMatchers("/css/**").permitAll()
            		.antMatchers("/img/**").permitAll()
            		.antMatchers("/js/**").permitAll()
-           		.anyRequest().authenticated();
+           		.anyRequest().authenticated().and().formLogin();
         http
         		.logout()
         			.disable();	// The logout procedure is already handled by SAML filters.
