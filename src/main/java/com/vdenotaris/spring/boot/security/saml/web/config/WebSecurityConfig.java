@@ -1,18 +1,3 @@
-/*
- * Copyright 2021 Vincenzo De Notaris
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License. 
- */
 
 package com.vdenotaris.spring.boot.security.saml.web.config;
 
@@ -450,21 +435,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
 	 */
     @Bean
     public FilterChainProxy samlFilter() throws Exception {
-        List<SecurityFilterChain> chains = new ArrayList<SecurityFilterChain>();
-        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/login/**"),
-                samlEntryPoint()));
-        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/logout/**"),
-                samlLogoutFilter()));
-        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/metadata/**"),
-                metadataDisplayFilter()));
-        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/Shibboleth.sso/SAML2/**"),
-                samlWebSSOProcessingFilter()));
-        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/SSOHoK/**"),
-                samlWebSSOHoKProcessingFilter()));
-        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/SingleLogout/**"),
-                samlLogoutProcessingFilter()));
-        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/discovery/**"),
-                samlIDPDiscovery()));
+        List<SecurityFilterChain> chains = new ArrayList<>();
+        // Changed login endpoint here from /saml/login/** to /Shibboleth.sso/Login/**
+        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/Shibboleth.sso/Login/**"), samlEntryPoint()));
+        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/logout/**"), samlLogoutFilter()));
+        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/metadata/**"), metadataDisplayFilter()));
+        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/Shibboleth.sso/SAML2/**"), samlWebSSOProcessingFilter()));
+        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/SSOHoK/**"), samlWebSSOHoKProcessingFilter()));
+        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/SingleLogout/**"), samlLogoutProcessingFilter()));
+        chains.add(new DefaultSecurityFilterChain(new AntPathRequestMatcher("/saml/discovery/**"), samlIDPDiscovery()));
         return new FilterChainProxy(chains);
     }
      
@@ -488,26 +467,27 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
      * @throws  Exception 
      */
     @Override 
-    protected void configure(HttpSecurity http) throws Exception {
+  protected void configure(HttpSecurity http) throws Exception {
         http
             .httpBasic()
-                .authenticationEntryPoint(samlEntryPoint());      
+                .authenticationEntryPoint(samlEntryPoint());
         http
-        		.addFilterBefore(metadataGeneratorFilter(), ChannelProcessingFilter.class)
-        		.addFilterAfter(samlFilter(), BasicAuthenticationFilter.class)
-        		.addFilterBefore(samlFilter(), CsrfFilter.class);
-        http        
+            .addFilterBefore(metadataGeneratorFilter(), ChannelProcessingFilter.class)
+            .addFilterAfter(samlFilter(), BasicAuthenticationFilter.class)
+            .addFilterBefore(samlFilter(), CsrfFilter.class);
+        http
             .authorizeRequests()
-           		.antMatchers("/").permitAll()
+                .antMatchers("/").permitAll()
                 .antMatchers("/Shibboleth.sso/SAML2/**").permitAll()
-           		.antMatchers("/saml/**").permitAll()
-           		.antMatchers("/css/**").permitAll()
-           		.antMatchers("/img/**").permitAll()
-           		.antMatchers("/js/**").permitAll()
-           		.anyRequest().authenticated();
+                .antMatchers("/Shibboleth.sso/Login/**").permitAll()  // <-- Added this line
+                .antMatchers("/saml/**").permitAll()
+                .antMatchers("/css/**").permitAll()
+                .antMatchers("/img/**").permitAll()
+                .antMatchers("/js/**").permitAll()
+                .anyRequest().authenticated();
         http
-        		.logout()
-        			.disable();	// The logout procedure is already handled by SAML filters.
+            .logout()
+                .disable();  // logout is handled by SAML filters
     }
  
     /**
@@ -533,3 +513,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter implements I
     }
 
 }
+
